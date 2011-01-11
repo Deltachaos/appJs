@@ -47,7 +47,7 @@
 	debug('navigator.userAgent: ' + navigator.userAgent, 'App');
 	debug('navigator.platform: ' + navigator.platform, 'App');
 
-	debug('Detected Browser Engine: ' + self.engine.name + '. Version: ' + self.engine.version, 'App');
+	debug('Detected Engine: ' + self.engine.name + '. Version: ' + self.engine.version, 'App');
 
 	var ua = navigator.userAgent.toLowerCase(),
 		platform = navigator.platform.toLowerCase();
