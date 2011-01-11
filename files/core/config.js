@@ -76,7 +76,6 @@
 		debug('Detected Browser: ' + self.browser.name + '. Version: ' + self.browser.version, 'App');
 	}
 
-	debug('Settings:', 'App');
 	debug('App.config.debug: ' + self.debug, 'App');
 	debug('App.config.baseurl: ' + self.baseurl, 'App');
 	debug('App.config.language.iso2: ' + self.language.iso2, 'App');
