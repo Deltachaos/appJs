@@ -66,6 +66,7 @@
 				self[self.configVars[i]] = tag[0].textContent;
 			}
 		}
+		debug('Running in AIR version: ' + self.air.version + '. Sandbox: ' + (self.air.sandbox ? 'true' : 'false'), 'App');
 	} else {
 		/* TODO: Complete Browser detection */
 		//its a browser
