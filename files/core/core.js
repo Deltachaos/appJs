@@ -1,8 +1,15 @@
 var App;
 App = {
 	debug: {
-		log: function() {
-			//Dummy function to avoid errors with debug 0
+		cache: [],
+		log: function(msg, tab, time) {
+			if(typeof App.debug.tabs == 'undefined') {
+				App.debug.cache.push({
+					msg: msg,
+					tab: tab,
+					time: time
+				});
+			}
 		}
 	}
 };

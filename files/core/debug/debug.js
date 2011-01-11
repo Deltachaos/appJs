@@ -1,16 +1,15 @@
 if (App.config.debug > 0) {
 	App.debug = new function() {
-		
 		if(App.config.air && (typeof air.Introspector) != 'undefined') {
 			air.Introspector.toggleWindow();
 		}
-		
+
 		var self = this;
 		self.tabs = {
 			Main: 1
 		}
 		self.id = 2;
-		
+
 		var debugConsole = $('<div id="debugConsole"><a href="#" class="close">x</a><ul><li class="active"><a href="#debugConsole-1">Main</a></li></ul><div style="display:block" class="debugDiv" id="debugConsole-1"></div></div>');
 		debugConsole.children('a.close').click(function(){
 			var toRight = ($('#debugConsole').outerWidth() - 25) * -1;
@@ -70,7 +69,7 @@ if (App.config.debug > 0) {
 			}
 		});
 		$('#debugConsole').resizable("option", "disabled", (parseInt($.cookie("debugConsole")) == 0));
-		
+
 		$('#debugConsole > ul > li > a').live('click', function(e){
 			$(this).parents('ul').children('li').removeClass('active');
 			$(this).parent().addClass('active');
@@ -79,7 +78,7 @@ if (App.config.debug > 0) {
 			$.cookie("debugConsoleTab", $(this).attr('tabname'));
 			return false;
 		});
-		
+
 		$('#debugConsole > ul > li > span').live('click', function(e){
 			$('#debugConsole ' + this.hash).remove();
 			self.tabs[$(this).parent().children('a').attr('tabname')] = undefined;
@@ -87,13 +86,13 @@ if (App.config.debug > 0) {
 			$('#debugConsole > ul > li > a:first-child').click();
 			return false;
 		});
-		
+
 		self.getId = function(){
 			var id = self.id;
 			self.id++;
 			return id;
 		}
-		
+
 		self.addTab = function(tabname){
 			var id = self.getId();
 			$('#debugConsole').append('<div class="debugDiv" id="debugConsole-' + id + '"></div>');
@@ -104,7 +103,7 @@ if (App.config.debug > 0) {
 			}
 			return self.tabs[tabname] = id;
 		}
-		
+
 		self.getTabByName = function(name){
 			if (name === undefined) {
 				name = 'Main';
@@ -120,10 +119,10 @@ if (App.config.debug > 0) {
 			}
 			return $('#debugConsole div#debugConsole-' + tabid);
 		}
-		
+
 		self.log = function(msg, tab){
 			if (typeof console != 'undefined' && typeof console.log == 'function') {
-				console.log(msg);
+				console.log((tab != null ? tab + ': ' : '') + msg);
 			} else if(App.config.air && (typeof air.Introspector != 'undefined')) {
 				air.Introspector.Console.log(msg);
 			}
@@ -138,6 +137,11 @@ if (App.config.debug > 0) {
 				tab.scrollTop(tab[0].scrollHeight - tab.outerHeight());
 			}
 		}
-		
+
+		$.each(App.debug.cache, function(index, value) {
+			self.log(value.msg, value.tab, value.time);
+		});
+
+
 	};
 };

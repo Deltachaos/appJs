@@ -8,12 +8,12 @@ class ToolsAppJsPackage extends ToolsAppPackage {
 		'core/core.js' => array(
 			'version' => '0.1'
 		),
+		array(
+			'callback' => 'config',
+			'mime' => 'text/javascript'
+		),
 		'core/config.js' => array(
 			'version' => '0.1'
-		),
-		array(
-			'callback' => 'appConfig',
-			'mime' => 'text/javascript'
 		)
 	);
 
@@ -21,7 +21,8 @@ class ToolsAppJsPackage extends ToolsAppPackage {
 	public $subpackages = array(
 		'debug' => array(
 			'packages' => array(
-				'Setup.Debugconsole'
+				'Tools.Jquery::cookie',
+				'Tools.Jquery::uiResizable'
 			),
 			'files' => array(
 				'core/debug/debug.js' => array(
@@ -55,10 +56,17 @@ class ToolsAppJsPackage extends ToolsAppPackage {
 
 	);
 
-	public function appConfig() {
-		//$data = '';
-		//return array('data' => $data);
-		return false;
+	public function config() {
+		$obj = array(
+			'debug' => Configure::read('debug'),
+			'baseurl' => Router::url('/'),
+			'language' => array(
+				'iso2' => 'de', //TODO: Insert right language
+				'iso3' => 'deu'
+			)
+		);
+		$js = 'App.config = '.json_encode($obj).";";
+		return array('data' => $js);
 	}
 
 }
