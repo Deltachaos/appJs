@@ -10,8 +10,8 @@ if (App.config.debug > 0) {
 		}
 		self.id = 2;
 
-		var debugConsole = $('<div id="debugConsole"><a href="#" class="close">x</a><ul><li class="active"><a href="#debugConsole-1">Main</a></li></ul><div style="display:block" class="debugDiv" id="debugConsole-1"></div></div>');
-		debugConsole.children('a.close').click(function(){
+		var debugConsole = $('<div id="debugConsole"><a href="#" class="close noHash">x</a><ul><li class="active"><a class="noHash" href="#debugConsole-1">Main</a></li></ul><div style="display:block" class="debugDiv" id="debugConsole-1"></div></div>');
+		debugConsole.children('a.close').click(function(e) {
 			var toRight = ($('#debugConsole').outerWidth() - 25) * -1;
 			var right = $('#debugConsole').css('right');
 			right = right.substr(0, right.length - 2);
@@ -24,6 +24,7 @@ if (App.config.debug > 0) {
 				});
 				$.cookie("debugConsole", 0);
 			}
+			e.stopImmediatePropagation();
 			return false;
 		});
 		debugConsole.click(function(e){
@@ -79,11 +80,12 @@ if (App.config.debug > 0) {
 			return false;
 		});
 
-		$('#debugConsole > ul > li > span').live('click', function(e){
+		$('#debugConsole > ul > li > span').live('click', function(e) {
 			$('#debugConsole ' + this.hash).remove();
 			self.tabs[$(this).parent().children('a').attr('tabname')] = undefined;
 			$(this).parent().remove();
 			$('#debugConsole > ul > li > a:first-child').click();
+			e.stopImmediatePropagation();
 			return false;
 		});
 
@@ -97,7 +99,7 @@ if (App.config.debug > 0) {
 			var id = self.getId();
 			$('#debugConsole').append('<div class="debugDiv" id="debugConsole-' + id + '"></div>');
 			$('#debugConsole').children('div.debugDiv').height($('#debugConsole').height() - 40);
-			$('#debugConsole ul').append('<li><a href="#debugConsole-' + id + '" tabname="' + htmlspecialchars(tabname) + '">' + htmlspecialchars(tabname) + '</a><span>x</span></li>');
+			$('#debugConsole ul').append('<li><a class="noHash" href="#debugConsole-' + id + '" tabname="' + htmlspecialchars(tabname) + '">' + htmlspecialchars(tabname) + '</a><span>x</span></li>');
 			if ($.cookie("debugConsoleTab") == tabname) {
 				$('#debugConsole > ul > li > a[href="#debugConsole-' + id + '"]').click();
 			}
