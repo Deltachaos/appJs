@@ -21,6 +21,7 @@ class ToolsAppJsPackage extends ToolsAppPackage {
 	public $subpackages = array(
 		'debug' => array(
 			'packages' => array(
+				'Tools.Php::htmlspecialchars',
 				'Tools.Jquery::cookie',
 				'Tools.Jquery::uiResizable'
 			),
