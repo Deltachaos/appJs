@@ -5,8 +5,10 @@ App.hash = new function() {
 	self.forceReload = false;
 	self.data = {};
 	self.url = {};
-	
-	
+
+	self.location = undefined;
+	self.anchor = '';
+
 	self.registerEvent = function(type, callback, autounregister) {
 
 	}
@@ -14,9 +16,53 @@ App.hash = new function() {
 
 	}
 
-	self.hashChange = function() {
+	self.error = function() {
 		
-		alert(window.location.hash);
+	}
+
+	self.parseData = function(data) {
+		var obj = {};
+		var pos;
+		//TODO: Encode
+		$.each(data.split('/'), function(index, value) {
+			pos = value.indexOf(':');
+			if(pos > 0) {
+				obj[value.substr(0, pos)] = value.substr(pos + 1);
+			}
+		});
+		return obj;
+	}
+
+	self.parseHash = function() {
+		var hash, pos, data;
+		data = '';
+		hash = window.location.hash.substr(1);
+		if(hash.lenght == 0) {
+			return;
+		}
+		pos = hash.indexOf('!');
+		if(pos == -1) {
+			self.error();
+			return;
+		}
+		self.anchor = hash.substr(0, pos);
+		hash = hash.substr(pos + 1);
+		pos = hash.indexOf('/!#/');
+		if(pos > 0) {
+			data = hash.substr(pos + 4);
+			hash = hash.substr(0, pos);
+		}
+		self.data = self.parseData(data);
+		self.location = hash;
+		debug("New Hash Data:" + 
+			"\nAnchor: " + self.anchor +
+			"\nLocation: " + self.location +
+			"\nData: " + App.jsonEncode(self.data), 'Hash');
+	}
+
+	self.hashChange = function() {
+		self.parseHash();
+		//alert(window.location.hash);
 		self.forceReload = false;
 	}
 	
@@ -32,25 +78,39 @@ App.hash = new function() {
 		if(!anchor) {
 			anchor = '';
 		}
-		return '#!' + anchor + '/';
+		return '#' + anchor + '!';
 	}
 
 	self.getDataUrl = function(data) {
 		if(!data) {
 			return '';
 		}
-		var str = '/!#/';
+		var prefix = '/!#/';
+		var str = '';
 		$.each(data, function(key, value) {
+			//TODO: Encode
 			str += key + ':' + value + '/';
 		})
-		return str;
+		if(str == '') {
+			return '';
+		}
+		return prefix + str;
 	}
 
 	self.getHash = function(href, data, anchor) {
-		href = self.getPathname(href);
-		data = self.getDataUrl(data);
+		if(self.location === undefined || href !== null) {
+			self.location = '/' + self.getPathname(href);
+		} else {
+			if(!anchor) {
+				anchor = self.anchor;
+			}
+			if(!data) {
+				data = self.data;
+			}
+		}
 		anchor = self.getAnchor(anchor);
-		return anchor + href + data;
+		data = self.getDataUrl(data);
+		return anchor + self.location + data;
 	}
 
 	self.href = function(href, data, anchor) {
@@ -84,7 +144,7 @@ App.hash = new function() {
 	}
 
 	self.redirect = function(href, data, anchor) {
-		window.location.href = '/' + self.getHash(href, data, anchor);
+		window.location.href = App.config.baseurl + self.getHash(href, data, anchor);
 		return true;
 	}
 
@@ -101,11 +161,10 @@ App.hash = new function() {
 	}
 	window.onhashchange = self.hashChange;
 
-	if(self.hash.length > 0 && self.hash.substr(0, 2) != '#!' || self.getPathname().length > 0) {
+	if(self.getPathname().length > 0) {
 		self.redirect(window.location.pathname, null, self.hash.substr(1));
-	} else if(self.hash.length > 0 && self.hash.substr(0, 2) == '#!') {
-		window.onhashchange.call(window);
 	}
+	window.onhashchange.call(window);
 
 	//Handle anchors and forms with ajax
 	$(document).ready(function() {

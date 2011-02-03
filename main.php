@@ -2,7 +2,7 @@
 
 class ToolsAppJsPackage extends ToolsAppPackage {
 
-	public $packages = array('Tools.Jquery');
+	public $packages = array('Tools.Jquery', 'Tools.Json');
 
 	public $files = array(
 		'core/core.js' => array(
