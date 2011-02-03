@@ -123,6 +123,9 @@ if (App.config.debug > 0) {
 		}
 
 		self.log = function(msg, tab){
+			if(typeof msg == 'object' || typeof msg == 'array') {
+				msg = App.jsonEncode(msg, "\t");
+			}
 			if (typeof console != 'undefined' && typeof console.log == 'function') {
 				console.log((tab != null ? tab + ': ' : '') + msg);
 			} else if(App.config.air && (typeof air.Introspector != 'undefined')) {

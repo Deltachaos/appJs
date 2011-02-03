@@ -6,7 +6,7 @@ App.hash = new function() {
 	self.data = {};
 	self.url = {};
 
-	self.location = undefined;
+	self.location = '/';
 	self.anchor = '';
 
 	self.registerEvent = function(type, callback, autounregister) {
@@ -37,20 +37,22 @@ App.hash = new function() {
 		var hash, pos, data;
 		data = '';
 		hash = window.location.hash.substr(1);
-		if(hash.lenght == 0) {
-			return;
-		}
-		pos = hash.indexOf('!');
-		if(pos == -1) {
-			self.error();
-			return;
-		}
-		self.anchor = hash.substr(0, pos);
-		hash = hash.substr(pos + 1);
-		pos = hash.indexOf('/!#/');
-		if(pos > 0) {
-			data = hash.substr(pos + 4);
-			hash = hash.substr(0, pos);
+		if(hash.length == 0) {
+			hash = '/';
+			self.anchor = '';
+		} else {
+			pos = hash.indexOf('!');
+			if(pos == -1) {
+				self.error();
+				return;
+			}
+			self.anchor = hash.substr(0, pos);
+			hash = hash.substr(pos + 1);
+			pos = hash.indexOf('/!#/');
+			if(pos > 0) {
+				data = hash.substr(pos + 4);
+				hash = hash.substr(0, pos);
+			}
 		}
 		self.data = self.parseData(data);
 		self.location = hash;
@@ -89,7 +91,9 @@ App.hash = new function() {
 		var str = '';
 		$.each(data, function(key, value) {
 			//TODO: Encode
-			str += key + ':' + value + '/';
+			if(value !== undefined) {
+				str += key + ':' + value + '/';
+			}
 		})
 		if(str == '') {
 			return '';
@@ -98,7 +102,7 @@ App.hash = new function() {
 	}
 
 	self.getHash = function(href, data, anchor) {
-		if(self.location === undefined || href !== null) {
+		if(href) {
 			self.location = '/' + self.getPathname(href);
 		} else {
 			if(!anchor) {
@@ -126,14 +130,34 @@ App.hash = new function() {
 		return true;
 	}
 
-	self.goToPathname = function(href, triggerEvent) {
+	self.setData = function(data) {
+		self.data = data;
+		return self.href();
+	}
+
+	self.unsetData = function() {
+		self.data = {};
+		return self.href();
+	}
+
+	self.set = function(key, value) {
+		self.data[key] = value;
+		return self.href();
+	}
+
+	self.unset = function(key) {
+		delete self.data[key];
+		return self.href();
+	}
+
+	self.goPath = function(href, triggerEvent) {
 		if(triggerEvent === undefined) {
 			triggerEvent = true;
 		}
 		return self.href(href);
 	}
 
-	self.goToAnchor = function(anchor, triggerEvent) {
+	self.goAnchor = function(anchor, triggerEvent) {
 		if(triggerEvent === undefined) {
 			triggerEvent = true;
 		}
@@ -170,12 +194,12 @@ App.hash = new function() {
 	$(document).ready(function() {
 		$('a[href^="/"][target!="_blank"]:not(.noHash)').live('click', function(e) {
 			self.forceReload = true;
-			self.goToPathname($(this).attr('href'));
+			self.goPath($(this).attr('href'));
 			e.stopImmediatePropagation();
 			return false;
 		});
 		$('a[href^="#"][target!="_blank"]:not(.noHash)').live('click', function(e) {
-			self.goToAnchor($(this).attr('href'));
+			self.goAnchor($(this).attr('href'));
 			e.stopImmediatePropagation();
 			return false;
 		});
