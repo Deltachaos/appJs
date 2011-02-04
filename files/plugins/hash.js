@@ -130,6 +130,8 @@ App.hash = new function() {
 		return true;
 	}
 
+
+	//API functions
 	self.setData = function(data) {
 		self.data = data;
 		return self.href();
@@ -166,6 +168,8 @@ App.hash = new function() {
 		}
 		return self.href(null, null, anchor);
 	}
+
+	
 
 	self.redirect = function(href, data, anchor) {
 		window.location.href = App.config.baseurl + self.getHash(href, data, anchor);
