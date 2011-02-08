@@ -1,4 +1,4 @@
-/*
+
 App.hash = new function() {
 
 	var self = this;
@@ -211,4 +211,3 @@ App.hash = new function() {
 
 };
 
-*/
