@@ -50,7 +50,30 @@ App.hash = new function() {
 		}
 	}
 	self.callEvent = function() {
-
+		var key, tmp;
+		tmp = getType(type, callback);
+		type = tmp[0];
+		key = tmp[1];
+		delete self.events[type][key];
+	}
+	self.registerEvent = function(type, callback, autounregister) {
+		var originaltype, tmp, key;
+		originaltype = type;
+		tmp = getType(type, callback);
+		type = tmp[0];
+		key = tmp[1];
+		if(type == 'url' || type == 'data' || type == 'anchor')  {
+			if(autounregister != null) {
+				window.jQuery(autounregister).livequery(function() {
+				}, function() {
+					self.unregisterEvent(originaltype, callback);
+				});
+			}
+			self.events[type][key] = callback;
+		}
+	}
+	self.callEvent = function() {
+		
 	}
 
 	self.error = function() {
