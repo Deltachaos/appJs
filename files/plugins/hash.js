@@ -3,21 +3,58 @@ App.hash = new function() {
 
 	var self = this;
 	self.forceReload = false;
-	self.data = {};
-	self.url = {};
 
+	self.events = {
+		url: {},
+		data: {},
+		anchor: {}
+	};
+
+	self.data = {};
 	self.location = '/';
 	self.anchor = '';
 
-	self.registerEvent = function(type, callback, autounregister) {
-
+	var getType = function(type, callback) {
+		var key, pos;
+		pos = type.indexOf('.');
+		if(pos == -1) {
+			key = callback;
+		} else {
+			key = type.substr(pos + 1);
+			type = type.substr(0, pos);
+		}
+		return [type, key];
 	}
+
 	self.unregisterEvent = function(type, callback) {
+		var key, tmp;
+		tmp = getType(type, callback);
+		type = tmp[0];
+		key = tmp[1];
+		delete self.events[type][key];
+	}
+	self.registerEvent = function(type, callback, autounregister) {
+		var originaltype, tmp, key;
+		originaltype = type;
+		tmp = getType(type, callback);
+		type = tmp[0];
+		key = tmp[1];
+		if(type == 'url' || type == 'data' || type == 'anchor')  {
+			if(autounregister != null) {
+				window.jQuery(autounregister).livequery(function() {
+				}, function() {
+					self.unregisterEvent(originaltype, callback);
+				});
+			}
+			self.events[type][key] = callback;
+		}
+	}
+	self.callEvent = function() {
 
 	}
 
 	self.error = function() {
-		
+
 	}
 
 	self.parseData = function(data) {
@@ -56,7 +93,7 @@ App.hash = new function() {
 		}
 		self.data = self.parseData(data);
 		self.location = hash;
-		debug("New Hash Data:" + 
+		debug("New Hash Data:" +
 			"\nAnchor: " + self.anchor +
 			"\nLocation: " + self.location +
 			"\nData: " + App.jsonEncode(self.data), 'Hash');
@@ -67,7 +104,7 @@ App.hash = new function() {
 		//alert(window.location.hash);
 		self.forceReload = false;
 	}
-	
+
 	self.getPathname = function(pathname) {
 		if(!pathname) {
 			pathname = window.location.pathname;
@@ -169,7 +206,7 @@ App.hash = new function() {
 		return self.href(null, null, anchor);
 	}
 
-	
+
 
 	self.redirect = function(href, data, anchor) {
 		window.location.href = App.config.baseurl + self.getHash(href, data, anchor);
@@ -181,7 +218,9 @@ App.hash = new function() {
 	if(!('onhashchange' in window)) {
 		//Fallback if onhashchange was not implemented
 		setInterval(function() {
-			if(window.location.hash != self.hash && window.location.hash.length > 0 && typeof (window.onhashchange) === 'function') {
+			if(window.location.hash != self.hash
+				&& window.location.hash.length > 0
+				&& typeof (window.onhashchange) === 'function') {
 				self.hash = window.location.hash;
 				window.onhashchange.call(window);
 			}
@@ -195,14 +234,14 @@ App.hash = new function() {
 	window.onhashchange.call(window);
 
 	//Handle anchors and forms with ajax
-	$(document).ready(function() {
-		$('a[href^="/"][target!="_blank"]:not(.noHash)').live('click', function(e) {
+	window.jQuery(document).ready(function() {
+		window.jQuery('a[href^="/"][target!="_blank"]:not(.noHash)').live('click', function(e) {
 			self.forceReload = true;
 			self.goPath($(this).attr('href'));
 			e.stopImmediatePropagation();
 			return false;
 		});
-		$('a[href^="#"][target!="_blank"]:not(.noHash)').live('click', function(e) {
+		window.jQuery('a[href^="#"][target!="_blank"]:not(.noHash)').live('click', function(e) {
 			self.goAnchor($(this).attr('href'));
 			e.stopImmediatePropagation();
 			return false;
@@ -211,3 +250,6 @@ App.hash = new function() {
 
 };
 
+App.hash.registerEvent('url', function(url) {
+
+});
