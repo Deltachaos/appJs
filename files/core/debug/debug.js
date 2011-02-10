@@ -126,6 +126,11 @@ if (App.config.debug > 0) {
 			if(typeof msg == 'object' || typeof msg == 'array') {
 				msg = App.jsonEncode(msg, "\t");
 			}
+			if(msg === undefined) {
+				msg = "<i>undefined</i>";
+			} else {
+				var msg = htmlspecialchars(msg).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br/>$2');
+			}
 			if (typeof console != 'undefined' && typeof console.log == 'function') {
 				console.log((tab != null ? tab + ': ' : '') + msg);
 			} else if(App.config.air && (typeof air.Introspector != 'undefined')) {
@@ -136,7 +141,6 @@ if (App.config.debug > 0) {
 			if (tab.scrollTop() == (tab[0].scrollHeight - tab.outerHeight())) {
 				scrollToBottom = true;
 			}
-			var msg = htmlspecialchars(msg).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br/>$2');
 			tab.append('<p>' + msg + '</p>');
 			if (scrollToBottom) {
 				tab.scrollTop(tab[0].scrollHeight - tab.outerHeight());
