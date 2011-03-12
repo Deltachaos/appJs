@@ -11,8 +11,14 @@ App.hash = new function() {
 	};
 
 	self.data = {};
-	self.location = '/';
+	self.baseurl = App.config.baseurl;
+	self.setLocation = function(location) {
+		self.location = location;
+		self.requestUrl = self.baseurl + self.location;
+	}
+	self.setLocation('/');
 	self.anchor = '';
+
 
 	var getType = function(type, callback) {
 		var key, pos;
@@ -91,16 +97,26 @@ App.hash = new function() {
 			}
 		}
 		self.data = self.parseData(data);
-		self.location = hash;
+		self.setLocation(hash);
 		debug("New Hash Data:" +
 			"\nAnchor: " + self.anchor +
 			"\nLocation: " + self.location +
 			"\nData: " + App.jsonEncode(self.data), 'Hash');
 	}
 
+	self.checkChange = function() {
+		return true;
+	}
+
 	self.hashChange = function() {
 		self.parseHash();
-		//alert(window.location.hash);
+		jQuery.each(self.events, function(key, events) {
+			if(self.checkChange(key)) {
+				jQuery.each(events, function(dummy, event) {
+					event.call(self);
+				});
+			}
+		});
 		self.forceReload = false;
 	}
 
@@ -139,7 +155,7 @@ App.hash = new function() {
 
 	self.getHash = function(href, data, anchor) {
 		if(href) {
-			self.location = '/' + self.getPathname(href);
+			self.setLocation('/' + self.getPathname(href));
 		} else {
 			if(!anchor) {
 				anchor = self.anchor;
@@ -249,6 +265,3 @@ App.hash = new function() {
 
 };
 
-App.hash.registerEvent('url', function(url) {
-
-});
