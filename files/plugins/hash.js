@@ -2,6 +2,47 @@
 App.hash = new function() {
 
 	var self = this;
+
+	self.equals = function(x, y) {
+		for(p in y) {
+			if(typeof x[p] == 'undefined') {
+				return false;
+			}
+		}
+
+		for(p in y) {
+			if(y[p]) {
+				switch(typeof y[p]) {
+					case 'object':
+						if(!self.equals(y[p], x[p])) {
+							return false;
+						}
+						break;
+					case 'function':
+						if(typeof x[p] == 'undefined' || (p != 'equals' && y[p].toString() != x[p].toString())) {
+							return false;
+						}
+						break;
+					default:
+						if(y[p] != x[p]) {
+							return false;
+						}
+				}
+			} else {
+				if (x[p]) {
+					return false;
+				}
+			}
+		}
+
+		for(p in x) {
+			if(typeof y[p] == 'undefined') {
+				return false;
+			}
+		}
+
+		return true;
+	}
 	self.forceReload = false;
 
 	self.events = {
@@ -10,11 +51,17 @@ App.hash = new function() {
 		anchor: {}
 	};
 
+	self.current = {
+		url: '',
+		anchor: '',
+		data: {}
+	}
+
 	self.data = {};
 	self.baseurl = App.config.baseurl;
 	self.setLocation = function(location) {
 		self.location = location;
-		self.requestUrl = self.baseurl + self.location;
+		self.requestUrl = self.baseurl + self.location.substr(1);
 	}
 	self.setLocation('/');
 	self.anchor = '';
@@ -104,7 +151,24 @@ App.hash = new function() {
 			"\nData: " + App.jsonEncode(self.data), 'Hash');
 	}
 
-	self.checkChange = function() {
+	self.checkChange = function(type) {
+		//alert(App.jsonEncode(self.current[type]));
+		var other;
+		switch(type) {
+			case 'anchor':
+				other = self.anchor;
+				break;
+			case 'url':
+				other = self.location;
+				break;
+			case 'data':
+				other = self.data;
+				break;
+		}
+		if(self.equals(self.current[type], other)) {
+			return false;
+		}
+		self.current[type] = other;
 		return true;
 	}
 
