@@ -152,23 +152,29 @@ App.hash = new function() {
 	}
 
 	self.checkChange = function(type) {
-		//alert(App.jsonEncode(self.current[type]));
-		var other;
 		switch(type) {
 			case 'anchor':
-				other = self.anchor;
+				if(self.current[type] == self.anchor) {
+					return false;
+				} else {
+					self.current[type] = self.anchor;
+				}
 				break;
 			case 'url':
-				other = self.location;
+				if(self.current[type] == self.location) {
+					return false;
+				} else {
+					self.current[type] = self.location;
+				}
 				break;
 			case 'data':
-				other = self.data;
+				if(self.equals(self.current[type], self.data)) {
+					return false;
+				} else {
+					self.current[type] = self.data;
+				}
 				break;
 		}
-		if(self.equals(self.current[type], other)) {
-			return false;
-		}
-		self.current[type] = other;
 		return true;
 	}
 
