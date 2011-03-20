@@ -1,1 +1,1 @@
-Todo
+AppJs is a javascript framework build as a package for cakePHP on top of jQuery, APE and SoundManager2 to use core cakePHP features like i18n in the browser and Adobe AIR. It also provides cross platform sound, realtime comunication and window management possibilities
